@@ -1,23 +1,19 @@
 name: Deploy Angular Portfolio to GitHub Pages
 
 on:
-  # Déclenche le workflow à chaque push sur la branche gh-pages
   push:
     branches:
       - gh-pages
 
-  # Permet également de lancer le déploiement manuellement
   workflow_dispatch:
 
-# Permissions nécessaires pour GitHub Pages
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# Évite plusieurs déploiements simultanés
 concurrency:
-  group: "pages"
+  group: pages
   cancel-in-progress: true
 
 jobs:
@@ -26,39 +22,27 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Récupération du code
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Installation de Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
 
-      # Installation des dépendances
       - name: Install dependencies
         run: npm ci
 
-      # Build Angular production
-      #
-      # Angular 18 génère :
-      # dist/angular-portfolio/browser
-      #
-      # Le base-href est adapté à GitHub Pages :
-      # https://baallou-hicham.github.io/angular-portfolio/
       - name: Build Angular application
         run: |
           npm run build -- \
             --configuration production \
             --base-href "https://baallou-hicham.github.io/angular-portfolio/"
 
-      # Configuration GitHub Pages
-      - name: Setup Pages
+      - name: Setup GitHub Pages
         uses: actions/configure-pages@v5
 
-      # Upload du dossier généré par Angular
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
@@ -67,17 +51,13 @@ jobs:
   deploy:
     name: Deploy to GitHub Pages
     runs-on: ubuntu-latest
-
-    # Le déploiement commence uniquement après le build
     needs: build
 
-    # Environnement GitHub Pages
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
-      # Déploiement de l'artifact sur GitHub Pages
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
