@@ -12,17 +12,13 @@ permissions:
   pages: write
   id-token: write
 
-concurrency:
-  group: pages
-  cancel-in-progress: true
-
 jobs:
   build:
     name: Build Angular
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Setup Node.js
@@ -40,16 +36,23 @@ jobs:
             --configuration production \
             --base-href "https://baallou-hicham.github.io/angular-portfolio/"
 
-      - name: Debug build output
+      - name: Inspect build output
         run: |
-          echo "=== Project root ==="
+          echo "===== DIST ====="
+
+          if [ -d "dist" ]; then
+            find dist -maxdepth 5 -type f -print
+          else
+            echo "ERREUR : le dossier dist n'existe pas"
+          fi
+
+          echo ""
+          echo "===== CURRENT DIRECTORY ====="
+          pwd
+
+          echo ""
+          echo "===== ROOT ====="
           ls -la
-
-          echo "=== dist ==="
-          ls -la dist || true
-
-          echo "=== All generated files ==="
-          find dist -maxdepth 4 -type f | head -100 || true
 
       - name: Setup GitHub Pages
         uses: actions/configure-pages@v5
