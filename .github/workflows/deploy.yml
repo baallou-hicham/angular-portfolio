@@ -36,23 +36,38 @@ jobs:
             --configuration production \
             --base-href "https://baallou-hicham.github.io/angular-portfolio/"
 
-      - name: Inspect build output
+
+      # IMPORTANT : diagnostic
+      - name: Show Angular build output
         run: |
-          echo "===== DIST ====="
-
-          if [ -d "dist" ]; then
-            find dist -maxdepth 5 -type f -print
-          else
-            echo "ERREUR : le dossier dist n'existe pas"
-          fi
-
-          echo ""
-          echo "===== CURRENT DIRECTORY ====="
+          echo "======================================"
+          echo "Current directory"
+          echo "======================================"
           pwd
 
           echo ""
-          echo "===== ROOT ====="
+          echo "======================================"
+          echo "Root directory"
+          echo "======================================"
           ls -la
+
+          echo ""
+          echo "======================================"
+          echo "DIST directory"
+          echo "======================================"
+
+          if [ -d "dist" ]; then
+            find dist -maxdepth 5 -print
+          else
+            echo "ERROR: dist directory does NOT exist"
+          fi
+
+          echo ""
+          echo "======================================"
+          echo "Angular JSON outputPath"
+          echo "======================================"
+
+          grep -n -A 5 -B 5 '"outputPath"' angular.json || true
 
       - name: Setup GitHub Pages
         uses: actions/configure-pages@v5
